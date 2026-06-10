@@ -1,5 +1,7 @@
 name: Run scraping pipeline
 
+# Triggers: scheduled run every 30 minutes, plus manual dispatch from the
+# Actions tab or `gh workflow run`.
 on:
   schedule:
     # Every 30 minutes (see AI/05_deployment.md)
