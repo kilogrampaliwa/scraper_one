@@ -1,0 +1,9 @@
+aiohttp>=3.9
+beautifulsoup4>=4.12
+supabase>=2.4
+streamlit>=1.32
+pandas>=2.2
+python-dotenv>=1.0
+
+# Testing
+pytest>=8.0

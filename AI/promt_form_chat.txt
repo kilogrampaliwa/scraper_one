@@ -1,0 +1,56 @@
+Build a modular data scraping system in Python with the following architecture:
+
+STACK
+- aiohttp + BeautifulSoup for scraping
+- SQLite as queue and memory
+- OpenRouter API (free tier) as LLM layer
+- asyncio for concurrency
+
+LAYER 1 — Scrapers
+Create an abstract base class BaseScraper (ABC) with:
+- fixed attributes: name: str
+- config attributes: url: str, params: dict
+- runtime attributes: raw_data: dict, output_data: dict
+- abstract methods: fetch(), validate(), emit()
+
+Implement two concrete classes:
+- APIScraper — uses aiohttp, expects JSON response
+- HTMLScraper — uses aiohttp + BeautifulSoup, extracts fields
+
+All fetch calls must use exponential backoff:
+- on 429: wait base_delay, then *2 each retry up to max_retries
+- after max_retries: mark scraper as blocked, stop retrying
+
+LAYER 2 — SQLite Queue
+Single table: queue
+Columns: id, source, url, priority, status, retry_count, 
+         max_retries, last_checked, raw_data, clean_data
+
+Statuses: raw → in_progress → ready / rejected
+
+Implement:
+- claim_batch(conn, n) — atomic, sets in_progress in one transaction
+- mark_ready(conn, id, data)
+- mark_rejected(conn, id) — increments retry_count, 
+  reverts to raw or sets rejected if limit reached
+
+LAYER 3 — LLM
+- Poll OpenRouter for availability before each request
+- Send raw_data from ready rows, one at a time
+- Write structured result back to clean_data
+- Update status to analyzed
+
+ORCHESTRATOR
+- Runs all layers in a loop via asyncio
+- On restart: resets in_progress rows older than 10min back to raw
+- Configurable: batch_size, max_concurrent_scrapers, base_delay
+
+Deliver as a clean Python package:
+/scraper
+  base.py       — BaseScraper ABC
+  api.py        — APIScraper
+  html.py       — HTMLScraper
+  db.py         — all SQLite functions
+  llm.py        — OpenRouter client
+  orchestrator.py — main loop
+  main.py       — entry point with example run

@@ -1,0 +1,59 @@
+Please assess the legal risks and compliance considerations of the following web scraping project from the perspective of EU law (including GDPR and database rights), as well as general international best practices.
+
+Project overview:
+
+A. E-commerce Price Monitoring
+
+* 2–3 scraping tasks collecting product listing pages from different online stores or categories.
+* Raw fields per product:
+
+  * product name
+  * price text
+  * currency
+  * availability text
+* Data formats vary across sources.
+* An LLM layer normalizes the raw data into:
+
+  * product_name
+  * brand
+  * category
+  * price (numeric)
+  * currency (ISO code)
+  * in_stock (boolean)
+* Cleaned data is stored in a price_history table to track price changes over time.
+
+B. Job Listings Analysis
+
+* 2–3 scraping tasks collecting job board listing and detail pages.
+* Raw fields per posting:
+
+  * job title
+  * company
+  * location text
+  * salary text
+  * job description and requirements
+* An LLM layer normalizes the raw data into:
+
+  * job_title
+  * company
+  * seniority
+  * tech_stack (array)
+  * salary_min
+  * salary_max
+  * currency
+  * location
+  * remote (boolean)
+* Cleaned data is stored in a job_postings table for filtering and aggregation.
+
+Please analyze:
+
+1. Whether scraping publicly accessible pages for these purposes is generally lawful.
+2. The legal significance of website Terms of Service and robots.txt files.
+3. Potential issues related to copyright and EU database rights.
+4. GDPR/privacy implications, especially regarding job postings that may contain personal data.
+5. Whether storing only structured, normalized data instead of full page content reduces legal risk.
+6. The risks associated with commercializing such a product.
+7. Best practices to minimize legal exposure (rate limiting, honoring robots.txt, avoiding personal data retention, etc.).
+8. Any major differences between EU and US legal approaches to web scraping.
+
+Provide a practical risk assessment (low / medium / high) for both the e-commerce and job-board use cases.
